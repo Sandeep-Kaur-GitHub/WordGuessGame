@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -51,29 +52,30 @@ class GameFragment : Fragment() {
 
 
         binding.correctButton.setOnClickListener { viewModel.onCorrect()
-            updateScoreText()
+
             updateWordText()
         }
         binding.skipButton.setOnClickListener { viewModel.onSkip()
-            updateScoreText()
+
             updateWordText()}
 
+       viewModel.score.observe(this, Observer { newScore ->
+            binding.scoreText.text = newScore.toString()
+        })
         return binding.root
 
     }
 
     private fun gameFinished() {
-        val action = GameFragmentDirections.actionGameToScore(viewModel.score)
+        val action = GameFragmentDirections.actionGameToScore(viewModel.score.value ?:0)
         findNavController(this).navigate(action)
     }
 
 
     private fun updateWordText() {
-        binding.wordText.text = viewModel.word
+        binding.wordText.text = viewModel.word.value
 
     }
 
-    private fun updateScoreText() {
-        binding.scoreText.text = viewModel.score.toString()
-    }
+
 }
